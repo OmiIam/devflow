@@ -21,7 +21,7 @@
 
 ## Overview
 
-DevFlow is a developer focused task manager designed specifically for how developers *actually* work.
+DevFlow is a developer-focused task manager designed specifically for how developers *actually* work.
 
 Most task managers almost always treat tasks as static items.  
 DevFlow treats **focus, interruption, and context switching** as first class concepts.
