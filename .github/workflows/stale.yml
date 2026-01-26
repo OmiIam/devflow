@@ -1,0 +1,160 @@
+name: Stale Management
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale-issues:
+    name: Mark Stale Issues
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Only process issues in this job
+          only-labels: ''
+          only-issue-labels: ''
+          exempt-issue-labels: 'pinned,security,in-progress,blocked,good first issue,help wanted'
+          
+          days-before-issue-stale: 30
+          days-before-issue-close: 7
+          stale-issue-label: 'stale'
+          
+          stale-issue-message: |
+            ## Stale Issue Notice
+            
+            This issue hasn't had activity in **30 days** and will close in **7 days** without updates.
+            
+            ### Keep this issue open by:
+            - Commenting with updates or progress
+            - Removing the `stale` label
+            - Adding context on why this is still important
+            
+            ### If you're working on this:
+            - Add the `in-progress` label
+            - Comment with your current status
+            - Request help if you're blocked
+            
+            *This helps us focus on active work. Thank you!* 
+          
+          close-issue-message: |
+            ## Closed Due to Inactivity
+            
+            This issue was automatically closed after 7 days of inactivity following the stale warning.
+            
+            ### Want to reopen?
+            - Add updated information or context
+            - Explain current relevance
+            - Show progress or blockers
+            - Tag a maintainer for review
+            
+            *We appreciate your contribution!*
+          
+          close-issue-reason: 'not_planned'
+          operations-per-run: 50
+          ascending: true
+          remove-stale-when-updated: true
+
+  stale-prs:
+    name: Mark Stale Pull Requests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Only process PRs in this job
+          only-labels: ''
+          only-pr-labels: ''
+          exempt-pr-labels: 'pinned,security,work-in-progress,blocked,dependencies'
+          exempt-draft-pr: true # Don't mark draft PRs as stale
+          
+          days-before-pr-stale: 14
+          days-before-pr-close: 7
+          stale-pr-label: 'stale'
+          
+          stale-pr-message: |
+            ## Stale Pull Request Notice
+            
+            This PR hasn't had activity in **14 days** and will close in **7 days** without updates.
+            
+            ### Keep this PR open by:
+            - Rebasing on the latest `main` branch
+            - Addressing review comments
+            - Removing the `stale` label
+            - Updating the description with current status
+            
+            ### Need help?
+            - Convert to draft if still working on it
+            - Add `blocked` label if waiting on something
+            - Request review from maintainers
+            
+            *Thank you for your contribution!* 
+          
+          close-pr-message: |
+            ## Closed Due to Inactivity
+            
+            This PR was automatically closed after 7 days of inactivity following the stale warning.
+            
+            ### Continue this work?
+            - Create a fresh PR with rebased changes
+            - Reference this PR: `Continues #{{ number }}`
+            - Address previous review feedback
+            - Update based on any main branch changes
+            
+            *Your work is valued - feel free to re-open the conversation!*
+          
+          operations-per-run: 50
+          ascending: true
+          remove-stale-when-updated: true
+
+  # Separate job for urgent/high-priority items with different timing
+  stale-high-priority:
+    name: Check High Priority Stale Items
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Only check high priority items
+          only-issue-labels: 'priority: high,priority: critical'
+          
+          days-before-issue-stale: 60 # Longer period before marking stale
+          days-before-issue-close: 14 # Longer period before closing
+          stale-issue-label: 'stale-high-priority'
+          
+          stale-issue-message: |
+            ## High Priority Issue Stale Warning
+            
+            This **high priority** issue hasn't had activity in **60 days**.
+            
+            Given its importance, it will remain open for **14 more days** before auto-closing.
+            
+            ### Required actions:
+            - Re-evaluate priority (is this still high priority?)
+            - Update with current status
+            - Assign if no one is working on it
+            - Set realistic timeline
+            
+            *High priority items need active attention!*
+          
+          close-issue-message: |
+            ## High Priority Issue Closed
+            
+            Even high priority issues need activity. This has been closed due to inactivity.
+            
+            If still critical, please reopen with updated information.
+          
+          operations-per-run: 25
+          ascending: true
