@@ -81,7 +81,7 @@ pub async fn health_check() -> Json<HealthResponse> {
 pub fn router() -> Router {
     Router::new()
         // `get()` creates a route that only matches GET requests.
-        // pas the`health_check` handler function to it.
+        // pass the `health_check` handler function to it.
         .route("/health", get(health_check))
 }
 
