@@ -1,0 +1,18 @@
+# This file is a placeholder for Docker Compose configuration.
+# I will use it later to set up a development environment with a PostgreSQL database.
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: devflow_db
+    environment:
+      POSTGRES_DB: devflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - devflow_data:/var/lib/postgresql/data
+
+volumes:
+  devflow_data:
