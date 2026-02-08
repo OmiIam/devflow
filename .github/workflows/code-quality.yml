@@ -1,38 +1,41 @@
+# .github/workflows/code-quality.yml
+#
+# Code Quality Workflow
+#
+# This workflow runs the Rust formatter (`cargo fmt`) and linter (`cargo clippy`)
+# to ensure all code in the repository adheres to style guidelines and
+# avoids common pitfalls.
+
 name: Code Quality
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
-    name: Lint & Format Check
+  code_quality_checks:
+    name: Formatting & Linting
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20.x
-        cache: 'pnpm'
-    
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-    
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-    
-    - name: Run ESLint
-      run: pnpm lint
-    
-    - name: Run Prettier
-      run: pnpm format:check
-    
-    - name: Run Svelte Check
-      run: pnpm check
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+        working-directory: ./backend
+
+      - name: Run linter
+        run: cargo clippy -- -D warnings
+        working-directory: ./backend

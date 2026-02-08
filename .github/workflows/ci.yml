@@ -1,86 +1,50 @@
-name: CI
+# .github/workflows/ci.yml
+#
+# Continuous Integration Workflow for the Rust Backend
+#
+# This workflow triggers on every push to the `main` branch and every
+# pull request targeting `main`. It builds the Rust code and runs th# full test suite to ensure the project remains stable and correct.
+
+name: Rust CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-    
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-    
-    - name: Run linter
-      run: pnpm lint
-    
-    - name: Run type check
-      run: pnpm type-check
-    
-    - name: Run tests
-      run: pnpm test:coverage
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage/coverage-final.json
-        flags: unittests
-        name: codecov-umbrella
-    
-    - name: Build
-      run: pnpm build
-    
-  e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20.x
-        cache: 'pnpm'
-    
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-    
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-    
-    - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
-    
-    - name: Run Playwright tests
-      run: pnpm test:e2e
-    
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            backend/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: cargo build --verbose
+        working-directory: ./backend
+
+      - name: Run tests
+        run: cargo test --verbose
+        working-directory: ./backend
