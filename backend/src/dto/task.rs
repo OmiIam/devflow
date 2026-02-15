@@ -33,7 +33,7 @@ pub struct UpdateTaskRequest {
     pub description: Option<String>,
     pub priority: Option<TaskPriority>,
     pub status: Option<TaskStatus>,
-    #[validate(custom = "validate_optional_tags")]
+    #[validate(custom = "validate_tags")]
     pub context_tags: Option<Vec<String>>,
     #[validate(url)]
     pub github_url: Option<String>,
@@ -48,13 +48,6 @@ fn validate_tags(tags: &Vec<String>) -> Result<(), ValidationError> {
         if t.trim().is_empty() || t.len() > 50 {
             return Err(ValidationError::new("invalid_context_tag"));
         }
-    }
-    Ok(())
-}
-
-fn validate_optional_tags(tags: &Option<Vec<String>>) -> Result<(), ValidationError> {
-    if let Some(tags) = tags {
-        validate_tags(tags)?;
     }
     Ok(())
 }
@@ -140,30 +133,39 @@ pub struct TaskSort {
     pub order: SortOrder,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskSortField {
+    #[default]
     CreatedAt,
     UpdatedAt,
     Priority,
 }
 
-impl Default for TaskSortField {
-    fn default() -> Self {
-        TaskSortField::CreatedAt
+impl std::fmt::Display for TaskSortField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TaskSortField::CreatedAt => write!(f, "created_at"),
+            TaskSortField::UpdatedAt => write!(f, "updated_at"),
+            TaskSortField::Priority => write!(f, "priority"),
+        }
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum SortOrder {
     Asc,
+    #[default]
     Desc,
 }
 
-impl Default for SortOrder {
-    fn default() -> Self {
-        SortOrder::Desc
+impl std::fmt::Display for SortOrder {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SortOrder::Asc => write!(f, "asc"),
+            SortOrder::Desc => write!(f, "desc"),
+        }
     }
 }
 

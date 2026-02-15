@@ -1,6 +1,5 @@
 mod common;
 
-use reqwest;
 use serde_json::Value;
 
 #[tokio::test]

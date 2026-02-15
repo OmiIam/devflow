@@ -5,4 +5,5 @@
 //! dependencies in tests and keep the rest of the codebase unaware of SQLx
 //! specifics.
 
+pub mod task_repository;
 pub mod user_repository;

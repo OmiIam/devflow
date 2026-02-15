@@ -4,7 +4,7 @@
 //! retrieve via the `State<T>` extractor.  We wrap the configuration and
 //! database pool in a single struct so it can be cloned cheaply via `Arc`.
 
-use crate::{config::AppConfig, db::DbPool};
+use crate::{config::AppConfig, db::DbPool, repositories::task_repository::TaskRepository};
 use std::sync::Arc;
 
 /// Bundle of cross-cutting dependencies handed to request handlers.
@@ -22,6 +22,10 @@ impl AppState {
     /// instead of struct literal syntax every time.
     pub fn new(config: AppConfig, db_pool: DbPool) -> Self {
         Self { config, db_pool }
+    }
+
+    pub fn task_repo(&self) -> TaskRepository<'_> {
+        TaskRepository::new(&self.db_pool)
     }
 }
 

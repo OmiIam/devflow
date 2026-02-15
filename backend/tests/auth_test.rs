@@ -2,16 +2,13 @@ mod common;
 
 use reqwest::StatusCode;
 use serde_json::json;
-use std::sync::{Mutex, OnceLock};
+use tokio::sync::Mutex;
 
-fn test_guard() -> std::sync::MutexGuard<'static, ()> {
-    static GUARD: OnceLock<Mutex<()>> = OnceLock::new();
-    GUARD.get_or_init(|| Mutex::new(())).lock().unwrap()
-}
+static TEST_GUARD: Mutex<()> = Mutex::const_new(());
 
 #[tokio::test]
 async fn register_creates_user_and_returns_token() {
-    let _lock = test_guard();
+    let _lock = TEST_GUARD.lock().await;
     let addr = common::spawn_app(false).await;
     let client = reqwest::Client::new();
 
@@ -36,7 +33,7 @@ async fn register_creates_user_and_returns_token() {
 
 #[tokio::test]
 async fn login_returns_token_for_seed_user() {
-    let _lock = test_guard();
+    let _lock = TEST_GUARD.lock().await;
     let addr = common::spawn_app(true).await;
     let client = reqwest::Client::new();
 
@@ -59,7 +56,7 @@ async fn login_returns_token_for_seed_user() {
 
 #[tokio::test]
 async fn me_returns_current_user() {
-    let _lock = test_guard();
+    let _lock = TEST_GUARD.lock().await;
     let addr = common::spawn_app(true).await;
     let client = reqwest::Client::new();
 
@@ -91,7 +88,7 @@ async fn me_returns_current_user() {
 
 #[tokio::test]
 async fn logout_returns_success_message() {
-    let _lock = test_guard();
+    let _lock = TEST_GUARD.lock().await;
     let addr = common::spawn_app(true).await;
     let client = reqwest::Client::new();
 
