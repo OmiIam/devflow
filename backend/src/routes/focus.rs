@@ -1,7 +1,10 @@
 use axum::{http::StatusCode, routing::post, Json, Router};
 use serde::{Deserialize, Serialize};
 
-use crate::models::focus_session::{FocusScoreSample, FocusState};
+use crate::{
+    models::focus_session::{FocusScoreSample, FocusState},
+    utils::SharedAppState,
+};
 
 #[derive(Debug, Deserialize)]
 pub struct FocusScoreRequest {
@@ -43,6 +46,6 @@ pub async fn calculate_focus_score(
     }))
 }
 
-pub fn router() -> Router {
+pub fn router() -> Router<SharedAppState> {
     Router::new().route("/focus/score", post(calculate_focus_score))
 }

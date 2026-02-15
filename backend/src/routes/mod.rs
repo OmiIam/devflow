@@ -7,9 +7,11 @@
 //! It merges routers from sub-modules like `health`, `auth`, etc.
 //! This modular approach keeps the routing logic organized and scalable.
 
+pub mod auth;
 pub mod focus;
 pub mod health;
 
+use crate::utils::SharedAppState;
 use axum::Router;
 
 /// # Combine all API routes
@@ -19,6 +21,9 @@ use axum::Router;
 ///
 /// ## Returns
 /// * `Router` - The combined Axum router for the entire API.
-pub fn api_router() -> Router {
-    Router::new().merge(health::router()).merge(focus::router())
+pub fn api_router() -> Router<SharedAppState> {
+    Router::<SharedAppState>::new()
+        .merge(health::router())
+        .merge(focus::router())
+        .merge(auth::router())
 }

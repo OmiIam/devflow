@@ -24,6 +24,7 @@
 //! }
 //! ```
 
+use crate::utils::SharedAppState;
 use axum::{routing::get, Json, Router};
 use chrono::Utc;
 use serde::Serialize;
@@ -76,7 +77,7 @@ pub async fn health_check() -> Json<HealthResponse> {
 ///
 /// # Returns
 /// * `Router` - An Axum router with the `/health` endpoint configured.
-pub fn router() -> Router {
+pub fn router() -> Router<SharedAppState> {
     Router::new()
         // `get()` creates a route that only matches GET requests.
         // pass the `health_check` handler function to it.

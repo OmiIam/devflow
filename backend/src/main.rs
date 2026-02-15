@@ -53,7 +53,6 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .merge(api_router())
-        .with_state::<SharedAppState>(())
         .layer(TraceLayer::new_for_http())
         .with_state(Arc::clone(&shared_state));
 

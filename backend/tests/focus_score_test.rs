@@ -5,7 +5,7 @@ use serde_json::json;
 
 #[tokio::test]
 async fn focus_score_returns_expected_value() {
-    let addr = common::spawn_app().await;
+    let addr = common::spawn_app(false).await;
     let client = reqwest::Client::new();
 
     let payload = json!({
@@ -28,7 +28,7 @@ async fn focus_score_returns_expected_value() {
 
 #[tokio::test]
 async fn focus_score_rejects_invalid_duration() {
-    let addr = common::spawn_app().await;
+    let addr = common::spawn_app(false).await;
     let client = reqwest::Client::new();
 
     let payload = json!({

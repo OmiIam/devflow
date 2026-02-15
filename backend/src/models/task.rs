@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::{fmt, str::FromStr};
 use uuid::Uuid;
 
 /// Priority buckets exposed to API clients.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, sqlx::Type)]
 #[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "text")]
 pub enum TaskPriority {
     Low,
     Medium,
@@ -36,8 +38,9 @@ impl FromStr for TaskPriority {
 }
 
 /// Task kanban states.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, sqlx::Type)]
 #[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "text")]
 pub enum TaskStatus {
     Todo,
     InProgress,
@@ -68,7 +71,7 @@ impl FromStr for TaskStatus {
 }
 
 /// Database model mirroring the `tasks` table.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Task {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -76,8 +79,10 @@ pub struct Task {
     pub description: Option<String>,
     pub priority: TaskPriority,
     pub status: TaskStatus,
-    pub context_tags: serde_json::Value,
+    pub context_tags: Vec<String>,
     pub github_url: Option<String>,
+    pub github_issue_number: Option<i32>,
+    pub github_repo: Option<String>,
     pub estimated_minutes: Option<i32>,
     pub completed_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,

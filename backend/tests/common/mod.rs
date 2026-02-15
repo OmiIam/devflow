@@ -13,9 +13,11 @@ use devflow_backend::{
     routes::api_router,
     utils::{AppState, SharedAppState},
 };
-use std::{net::SocketAddr, sync::Arc};
+use std::{env, net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
+
+pub mod db;
 
 /// # Spawn App and Return Address
 ///
@@ -30,17 +32,21 @@ use tower_http::trace::TraceLayer;
 ///
 /// A `SocketAddr` that can be used by an HTTP client (like `reqwest`) to
 /// send requests to the test server.
-pub async fn spawn_app() -> SocketAddr {
+pub async fn spawn_app(seed: bool) -> SocketAddr {
     let config = test_config();
     let pool = create_pool(&config.database, config.environment)
         .await
         .expect("failed to create test database pool");
+    if seed {
+        crate::common::db::seed_database(&pool).await;
+    } else {
+        crate::common::db::reset_database(&pool).await;
+    }
     let state: SharedAppState = AppState::new(config.clone(), pool).into();
 
     // Build the application router with all the routes.
     let app = Router::new()
         .merge(api_router())
-        .with_state::<SharedAppState>(())
         .layer(TraceLayer::new_for_http())
         .with_state(Arc::clone(&state));
 
@@ -67,7 +73,7 @@ fn test_config() -> AppConfig {
             port: 0,
         },
         database: DatabaseConfig {
-            url: "postgres://placeholder/devflow".to_string(),
+            url: test_database_url(),
             max_connections: 1,
         },
         auth: AuthConfig {
@@ -75,4 +81,10 @@ fn test_config() -> AppConfig {
             jwt_expiry_hours: 1,
         },
     }
+}
+
+fn test_database_url() -> String {
+    env::var("TEST_DATABASE_URL")
+        .or_else(|_| env::var("DATABASE_URL"))
+        .unwrap_or_else(|_| "postgres://postgres:password@localhost:5432/devflow".to_string())
 }

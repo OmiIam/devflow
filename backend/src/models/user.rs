@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use uuid::Uuid;
 
 /// Represents an application user persisted in PostgreSQL.
@@ -8,7 +9,7 @@ use uuid::Uuid;
 /// text, only the derived hash) so it can safely cross service/repository
 /// boundaries.  The struct derives `Serialize`/`Deserialize` for test fixtures
 /// and JSON conversions.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct User {
     /// Primary key generated as a UUID v4.
     pub id: Uuid,
@@ -16,8 +17,8 @@ pub struct User {
     pub email: String,
     /// Bcrypt/Argon2 hash stored instead of the raw password.
     pub password_hash: String,
-    /// Optional display name shown in UI.
-    pub name: Option<String>,
+    /// Display name shown in UI.
+    pub name: String,
     /// Optional GitHub user identifier when linked.
     pub github_id: Option<String>,
     /// OAuth access token required for GitHub API access.

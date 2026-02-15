@@ -21,12 +21,16 @@ use std::fmt;
 #[derive(Debug, Clone, Deserialize)]
 pub struct AppConfig {
     /// Which environment the process thinks it is running in.
+    #[serde(default)]
     pub environment: EnvironmentKind,
     /// Settings required for binding the HTTP server.
+    #[serde(default)]
     pub server: ServerConfig,
     /// Database connection information and pool sizing.
+    #[serde(default)]
     pub database: DatabaseConfig,
     /// Authentication-specific configuration such as JWT secrets.
+    #[serde(default)]
     pub auth: AuthConfig,
 }
 
@@ -102,6 +106,15 @@ impl ServerConfig {
     }
 }
 
+impl Default for ServerConfig {
+    fn default() -> Self {
+        Self {
+            host: default_server_host(),
+            port: default_server_port(),
+        }
+    }
+}
+
 /// Database connection settings used by SQLx.
 #[derive(Debug, Clone, Deserialize)]
 pub struct DatabaseConfig {
@@ -122,6 +135,15 @@ fn default_pool_size() -> u32 {
     5
 }
 
+impl Default for DatabaseConfig {
+    fn default() -> Self {
+        Self {
+            url: default_database_url(),
+            max_connections: default_pool_size(),
+        }
+    }
+}
+
 /// Authentication related settings.
 #[derive(Debug, Clone, Deserialize)]
 pub struct AuthConfig {
@@ -139,6 +161,15 @@ fn default_jwt_secret() -> String {
 
 fn default_jwt_expiry_hours() -> u16 {
     24 * 7
+}
+
+impl Default for AuthConfig {
+    fn default() -> Self {
+        Self {
+            jwt_secret: default_jwt_secret(),
+            jwt_expiry_hours: default_jwt_expiry_hours(),
+        }
+    }
 }
 
 #[cfg(test)]
