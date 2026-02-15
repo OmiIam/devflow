@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+frontend/.next
+frontend/out
+frontend/.turbo
+frontend/coverage
+frontend/dist
+
+# Rust
+target
+backend/target
+backend/.sqlx
+
+# Logs & coverage
+*.log
+coverage
+lcov.info
+playwright-report
+tests/e2e/artifacts
+
+# Docker artifacts
+.docker
+
+# Misc
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+
+# Docs
+docs

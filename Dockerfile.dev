@@ -1,0 +1,10 @@
+FROM rust:1.76-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y pkg-config libssl-dev clang && rm -rf /var/lib/apt/lists/*
+RUN cargo install cargo-watch
+ENV RUST_LOG=debug,devflow_backend=debug
+COPY backend/Cargo.toml backend/Cargo.lock /app/backend/
+WORKDIR /app/backend
+RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build && rm -rf src
+COPY backend/ /app/backend/
+CMD ["cargo", "watch", "-x", "run --bin devflow-backend"]

@@ -1,0 +1,11 @@
+   {
+    "name": "devflow-monorepo",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "docker:dev": "docker compose up --build",
+      "docker:down": "docker compose down -v",
+      "docker:test": "docker compose -f docker-compose.test.yml up --build --abort-on-container-exit",
+      "docker:test:down": "docker compose -f docker-compose.test.yml down -v"
+    }
+  }

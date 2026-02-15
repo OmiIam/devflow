@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  backend-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /app/backend
+    env_file:
+      - .env.example
+    command: ["cargo", "test", "--all", "--", "--nocapture"]
+    depends_on:
+      - database
+
+  frontend-tests:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env.example
+    command: ["npm", "run", "test"]
+
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.49.0-jammy
+    working_dir: /tests
+    volumes:
+      - ./:/tests
+    command: ["npx", "playwright", "test", "-c", "tests/e2e/playwright.config.ts"]
+    depends_on:
+      - backend-tests
+      - frontend-tests
+
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: devflow_test
+      POSTGRES_USER: devflow
+      POSTGRES_PASSWORD: devflow
+    ports:
+      - "55432:5432"
+
