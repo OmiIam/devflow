@@ -1,44 +1,68 @@
 [package]
+# Crate name matches the binary target in src/main.rs.
 name = "devflow-backend"
+# Semantic version so downstream crates/consumers can reason about compatibility.
 version = "0.1.0"
+# Rust 2021 edition enables the latest stable language ergonomics (module system, IntoIterator, etc.).
 edition = "2021"
 
+# Lint warnings for future-incompatible code help keep dependencies fresh.
+# NOTE TO BEGINNERS:
+# - Cargo uses TOML syntax. Lines starting with `#` are comments.
+# - Tables like `[dependencies]` group related keys, similar to INI sections.
 
 [dependencies]
-# Web Framework
+# --- HTTP Layer -------------------------------------------------------------
+# Axum provides routing, extractors, and middleware for async HTTP servers.
 axum = { version = "0.7", features = ["macros"] }
+# Tokio is the asynchronous runtime that drives Axum, timers, and networking.
 tokio = { version = "1.35", features = ["full"] }
+# Tower supplies middleware traits (limiters, timeouts) that Axum builds upon.
 tower = { version = "0.4", features = ["timeout", "limit"] }
+# tower-http bundles ready-made middleware (CORS, tracing, compression).
 tower-http = { version = "0.5", features = ["cors", "trace", "compression-br"] }
 
-# Database
+# --- Persistence Layer -----------------------------------------------------
+# SQLx offers compile-time checked Postgres queries plus connection pooling.
 sqlx = { version = "0.7", features = ["runtime-tokio", "postgres", "uuid", "chrono", "migrate"] }
 
-# Serialization
+# --- Serialization & Validation --------------------------------------------
+# Serde serializes/deserializes Rust structs to/from JSON for DTOs.
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-# Validation
+# validator lets us declaratively validate DTOs with #[derive(Validate)].
 validator = { version = "0.16", features = ["derive"] }
 
-# Authentication & Security
+# --- Security ---------------------------------------------------------------
+# jsonwebtoken (JWT) issues/verifies stateless auth tokens.
 jsonwebtoken = "9.2"
+# argon2 is the password hashing algorithm recommended for modern backends.
 argon2 = "0.5"
+# rand feeds secure random salts/nonces into hashing and token creation.
 rand = "0.8"
 
-# UUID and Time
+# --- Domain Types -----------------------------------------------------------
+# uuid generates unique identifiers for users/tasks and integrates with Serde.
 uuid = { version = "1.6", features = ["v4", "serde"] }
+# chrono handles timestamps, formatting, and timezone-aware data.
 chrono = { version = "0.4", features = ["serde"] }
 
-# Environment & Configuration
+# --- Configuration ----------------------------------------------------------
+# dotenvy loads local .env files for developer-friendly configuration overrides.
 dotenvy = "0.15"
+# config merges environment vars + files into strongly typed structs.
 config = "0.14"
 
-# Error Handling & Logging
+# --- Diagnostics ------------------------------------------------------------
+# anyhow gives ergonomic context-rich error propagation (primarily in binaries).
 anyhow = "1.0"
+# thiserror lets us derive domain-specific error enums for clean error handling.
 thiserror = "1.0"
+# tracing is the structured logging facade Axum integrates with.
 tracing = "0.1"
+# tracing-subscriber configures tracing filters and formatters.
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-# HTTP Client (for GitHub API)
+# --- HTTP Clients -----------------------------------------------------------
+# reqwest is used for outbound HTTP calls (GitHub APIs, future integrations).
 reqwest = { version = "0.11", features = ["json"] }

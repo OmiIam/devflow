@@ -45,3 +45,4 @@ tests/e2e/artifacts/
 # Misc
 *.pem
 *.key
+IMPLEMENTATION_RULES.md

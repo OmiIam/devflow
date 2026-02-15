@@ -13,7 +13,9 @@
         "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
         "test": "vitest run --coverage",
         "test:watch": "vitest",
-        "test:ci": "vitest run --coverage --reporter=junit --outputFile=artifacts/vitest-junit.xml"
+        "test:ci": "vitest run --coverage --reporter=junit --outputFile=artifacts/vitest-junit.xml",
+        "test:e2e": "playwright test",
+        "@playwright/test": "^1.49.0"
     },
     "devDependencies": {
         "@testing-library/jest-dom": "^6.4.2",
@@ -22,6 +24,7 @@
         "eslint-config-next": "^16.1.4",
         "prettier": "^3.2.5",
         "vitest": "^3.2.4",
-        "jsdom": "^24.0.0"
+        "jsdom": "^24.0.0",
+        "@playwright/test": "^1.49.0"
     }
 }

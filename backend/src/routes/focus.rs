@@ -1,8 +1,7 @@
 use axum::{http::StatusCode, routing::post, Json, Router};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
-use crate::models::focus_session::{FocusSession, FocusState};
+use crate::models::focus_session::{FocusScoreSample, FocusState};
 
 #[derive(Debug, Deserialize)]
 pub struct FocusScoreRequest {
@@ -33,9 +32,7 @@ pub async fn calculate_focus_score(
         ));
     }
 
-    let session = FocusSession {
-        id: Uuid::new_v4(),
-        user_id: Uuid::new_v4(),
+    let session = FocusScoreSample {
         duration_minutes: payload.duration_minutes,
         interruptions: payload.interruptions,
         state: payload.state,

@@ -7,8 +7,13 @@
 //! and make integration tests cleaner and easier to write.
 
 use axum::Router;
-use devflow_backend::routes::api_router;
-use std::net::SocketAddr;
+use devflow_backend::{
+    config::{AppConfig, AuthConfig, DatabaseConfig, EnvironmentKind, ServerConfig},
+    db::create_pool,
+    routes::api_router,
+    utils::{AppState, SharedAppState},
+};
+use std::{net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
 
@@ -26,10 +31,18 @@ use tower_http::trace::TraceLayer;
 /// A `SocketAddr` that can be used by an HTTP client (like `reqwest`) to
 /// send requests to the test server.
 pub async fn spawn_app() -> SocketAddr {
+    let config = test_config();
+    let pool = create_pool(&config.database, config.environment)
+        .await
+        .expect("failed to create test database pool");
+    let state: SharedAppState = AppState::new(config.clone(), pool).into();
+
     // Build the application router with all the routes.
     let app = Router::new()
         .merge(api_router())
-        .layer(TraceLayer::new_for_http());
+        .with_state::<SharedAppState>(())
+        .layer(TraceLayer::new_for_http())
+        .with_state(Arc::clone(&state));
 
     // Bind to a random available port on the loopback address.
     // `0` is a special port number that tells the OS to pick a random, unused port.
@@ -44,4 +57,22 @@ pub async fn spawn_app() -> SocketAddr {
     });
 
     addr
+}
+
+fn test_config() -> AppConfig {
+    AppConfig {
+        environment: EnvironmentKind::Test,
+        server: ServerConfig {
+            host: "127.0.0.1".to_string(),
+            port: 0,
+        },
+        database: DatabaseConfig {
+            url: "postgres://placeholder/devflow".to_string(),
+            max_connections: 1,
+        },
+        auth: AuthConfig {
+            jwt_secret: "test-secret".to_string(),
+            jwt_expiry_hours: 1,
+        },
+    }
 }

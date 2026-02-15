@@ -24,10 +24,9 @@
 //! }
 //! ```
 
-use axum::{routing::get, Router, Json};
-use serde::Serialize;
+use axum::{routing::get, Json, Router};
 use chrono::Utc;
-
+use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -52,7 +51,6 @@ pub struct HealthResponse {
 ///   JSON string, and sets the `Content-Type` HTTP header to `application/json`.
 ///   This is an elegant way to create JSON responses.
 pub async fn health_check() -> Json<HealthResponse> {
-  
     let response = HealthResponse {
         status: "ok",
         timestamp: Utc::now().to_rfc3339(),

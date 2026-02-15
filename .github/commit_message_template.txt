@@ -1,0 +1,6 @@
+<type>(<scope>): <subject>
+
+<body - why, how, tests run>
+
+<footer - BREAKING CHANGE: ..., Closes #issue>
+

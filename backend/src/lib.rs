@@ -25,9 +25,15 @@
 //! - `utils`: Shared utility functions (e.g., JWT, password hashing).
 
 // This is the main entry point for the library.
-// will declare all  public modules here.
-pub mod routes;
+// Public modules are declared here so the binary crate and integration tests
+// can import from a single namespace (e.g. `devflow_backend::routes::api_router`).
+pub mod config;
+pub mod db;
+pub mod dto;
+pub mod handlers;
+pub mod middleware;
 pub mod models;
-// ... and so on for other modules 
-
-
+pub mod repositories;
+pub mod routes;
+pub mod services;
+pub mod utils;
