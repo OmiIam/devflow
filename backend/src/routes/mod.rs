@@ -8,6 +8,7 @@
 //! This modular approach keeps the routing logic organized and scalable.
 
 pub mod health;
+pub mod focus;
 
 use axum::Router;
 
@@ -20,10 +21,6 @@ use axum::Router;
 /// * `Router` - The combined Axum router for the entire API.
 pub fn api_router() -> Router {
     Router::new()
-        // Merge the health check router.
-        // The `.merge()` method is a convenient way to combine routers.
         .merge(health::router())
-    // will need to add more routers here as i build them.
-    // .merge(auth::router())
-    // .merge(tasks::router())
+        .merge(focus::router())
 }
