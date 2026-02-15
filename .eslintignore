@@ -1,0 +1,11 @@
+node_modules
+frontend/.next
+frontend/out
+frontend/.turbo
+frontend/coverage
+frontend/dist
+backend/target
+docs
+.husky
+*.config.js
+*.config.ts
