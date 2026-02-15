@@ -1,0 +1,47 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / tooling
+.idea/
+.vscode/
+*.swp
+
+# Node / frontend
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/coverage/
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!*.example
+backend/.env
+
+# Rust / backend
+target/
+backend/target/
+backend/.sqlx/
+
+# Coverage & test artifacts
+coverage/
+lcov.info
+playwright-report/
+tests/e2e/artifacts/
+
+# Docker
+.docker/
+
+# Misc
+*.pem
+*.key
